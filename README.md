@@ -82,7 +82,7 @@ Script - Descripción - Entradas clave - Salidas clave
 
 **4_indicators_union.R** - Fusión Institucional + Bibliométrica: Une los datos de RRHH (Web UGR) con Scopus mediante cruce en cascada (Email > ORCID > ID > Nombre). - Entradas: `investigadores_ugr_scraped.csv` y `df_au_UGR_complete.csv` - Salidas: `investigadores_ugr_merged_with_scopus.csv`
 
-**5_match_authors_by_email.R** - Cruce con PDI (Email): Identifica qué profesores del listado oficial PDI están en nuestra base de datos bibliométrica. - Entradas: `datos_pdi_ugr.csv` y `investigadores_ugr_merged.csv` - Salidas: `final_matches_pdi.csv` y `debug_04_unmatched_pdi.csv`
+**5_match_authors_by_email.R** - Cruce con PDI (Email): Identifica qué profesores del listado oficial PDI están en nuestra base de datos bibliométrica. - Entradas: `datos_pdi_ugr.csv` y `investigadores_ugr_merged_with_scopus.csv` - Salidas: `final_matches_pdi.csv` y `debug_04_unmatched_pdi.csv`
 
 **6_crosscheck_people.R** - Rescate de PDI (Nombre): Intenta identificar a los profesores que no cruzaron por email usando algoritmos de similitud de nombre. - Entradas: `debug_04_unmatched_pdi.csv` - Salidas: `final_matches_consolidated.csv`
 
