@@ -72,6 +72,8 @@ El procesamiento se divide en una secuencia lógica de scripts numerados. El ord
 
 Script - Descripción - Entradas clave - Salidas clave
 
+Preparación de la base de datos (scripts en R)
+
 **00_eids_email.R** - Minería de Emails (Básica): Extrae correos de contacto de los archivos exportados manualmente de Scopus. Asocia email al paper. - Entradas: `Scopus_manualX.csv` - Salidas: `df_eids_email.csv`
 
 **01_scopus_search.R** - Descarga Bibliométrica (API): Descarga la producción completa UGR (2015-2025) vía API. Estructura base del proyecto. - - Salidas: `df_pub_comp.csv` y `df_au_UGR.csv`
@@ -103,6 +105,9 @@ Script - Descripción - Entradas clave - Salidas clave
 **14_build_author_text_profile_bruto.R** - Tabla en bruto de `author_text_profiles.csv` con las keywords del autor repetidas, de manera que el embedding las sintetice según el número de veces que aparecen.  - Entradas: `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `author_text_profiles_bruto.csv`
 
 **15_build_pubs.R** - Obtiene una tabla que recoge la información de df_pub_comp_ENRICHED y la información de los topics de OpenAlex. La información de los topics se limpia. - Entradas: `df_pub_comp_ENRICHED.csv` y `openalex_topics.csv`- Salidas: `final_pubs.csv`
+
+Preparación del modelo SPECTER2 (Scripts en Python)
+
 
 ## ⚠️ Notas Importantes de Mantenimiento
 
