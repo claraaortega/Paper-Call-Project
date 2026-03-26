@@ -72,25 +72,25 @@ El procesamiento se divide en una secuencia lógica de scripts numerados. El ord
 
 Script - Descripción - Entradas clave - Salidas clave
 
-**0_eids_email.R** - Minería de Emails (Básica): Extrae correos de contacto de los archivos exportados manualmente de Scopus. Asocia email al paper. - Entradas: `Scopus_manualX.csv` - Salidas: `df_eids_email.csv`
+**00_eids_email.R** - Minería de Emails (Básica): Extrae correos de contacto de los archivos exportados manualmente de Scopus. Asocia email al paper. - Entradas: `Scopus_manualX.csv` - Salidas: `df_eids_email.csv`
 
-**1_scopus_search.R** - Descarga Bibliométrica (API): Descarga la producción completa UGR (2015-2025) vía API. Estructura base del proyecto. - - Salidas: `df_pub_comp.csv` y `df_au_UGR.csv`
+**01_scopus_search.R** - Descarga Bibliométrica (API): Descarga la producción completa UGR (2015-2025) vía API. Estructura base del proyecto. - - Salidas: `df_pub_comp.csv` y `df_au_UGR.csv`
 
-**2_author_retrieval.R** - Enriquecimiento de Perfiles: Descarga metadatos detallados (ORCID, Depto. actual) para cada autor UGR detectado. - Entradas: `df_au_UGR.csv` - Salidas: `df_au_UGR_complete.csv`
+**02_author_retrieval.R** - Enriquecimiento de Perfiles: Descarga metadatos detallados (ORCID, Depto. actual) para cada autor UGR detectado. - Entradas: `df_au_UGR.csv` - Salidas: `df_au_UGR_complete.csv`
 
-**3_enrich_authors_with_email.R** - Inyección de Emails: Rellena huecos de contacto usando dos estrategias: cruce directo (Fase 1) y rescate (Fase 2). - Entradas: `df_au_UGR_complete.csv` y las salidas del 00 - Salidas: `df_au_UGR_complete.csv` (actualizado)
+**03_enrich_authors_with_email.R** - Inyección de Emails: Rellena huecos de contacto usando dos estrategias: cruce directo (Fase 1) y rescate (Fase 2). - Entradas: `df_au_UGR_complete.csv` y las salidas del 00 - Salidas: `df_au_UGR_complete.csv` (actualizado)
 
-**4_indicators_union.R** - Fusión Institucional + Bibliométrica: Une los datos de RRHH (Web UGR) con Scopus mediante cruce en cascada (Email > ORCID > ID > Nombre). - Entradas: `investigadores_ugr_scraped.csv` y `df_au_UGR_complete.csv` - Salidas: `investigadores_ugr_merged_with_scopus.csv`
+**04_indicators_union.R** - Fusión Institucional + Bibliométrica: Une los datos de RRHH (Web UGR) con Scopus mediante cruce en cascada (Email > ORCID > ID > Nombre). - Entradas: `investigadores_ugr_scraped.csv` y `df_au_UGR_complete.csv` - Salidas: `investigadores_ugr_merged_with_scopus.csv`
 
-**5_match_authors_by_email.R** - Cruce con PDI (Email): Identifica qué profesores del listado oficial PDI están en nuestra base de datos bibliométrica. - Entradas: `datos_pdi_ugr.csv` y `investigadores_ugr_merged_with_scopus.csv` - Salidas: `final_matches_pdi.csv` y `debug_04_unmatched_pdi.csv`
+**05_match_authors_by_email.R** - Cruce con PDI (Email): Identifica qué profesores del listado oficial PDI están en nuestra base de datos bibliométrica. - Entradas: `datos_pdi_ugr.csv` y `investigadores_ugr_merged_with_scopus.csv` - Salidas: `final_matches_pdi.csv` y `debug_04_unmatched_pdi.csv`
 
-**6_crosscheck_people.R** - Rescate de PDI (Nombre): Intenta identificar a los profesores que no cruzaron por email usando algoritmos de similitud de nombre. - Entradas: `debug_04_unmatched_pdi.csv` - Salidas: `final_matches_consolidated.csv`
+**06_crosscheck_people.R** - Rescate de PDI (Nombre): Intenta identificar a los profesores que no cruzaron por email usando algoritmos de similitud de nombre. - Entradas: `debug_04_unmatched_pdi.csv` - Salidas: `final_matches_consolidated.csv`
 
-**7_openalex_topics.R** - Topics de Investigación: Consulta a OpenAlex para obtener los temas (Topics) de cada publicación. Normaliza DOIs. - Entradas: `df_pub_comp.csv` - Salidas: `df_pub_UGR_with_topics.csv`
+**07_openalex_topics.R** - Topics de Investigación: Consulta a OpenAlex para obtener los temas (Topics) de cada publicación. Normaliza DOIs. - Entradas: `df_pub_comp.csv` - Salidas: `df_pub_UGR_with_topics.csv`
 
-**8_fetch_author_publications.R** - Descarga todo el historial de publicaciones de los autores en bruto. - Entradas: `final_matches_consolidated.csv` - Salidas: `author_filtered_publications.csv`
+**08_fetch_author_publications.R** - Descarga todo el historial de publicaciones de los autores en bruto. - Entradas: `final_matches_consolidated.csv` - Salidas: `author_filtered_publications.csv`
 
-**9_merge_publications.R** - Fusiona la base de datos original de publicaciones con las nuevas descargas por autor. - Entradas: `df_pub_comp.csv` y  `author_filtered_publications.csv`- Salidas: `df_pub_comp_ENRICHED.csv`
+**09_merge_publications.R** - Fusiona la base de datos original de publicaciones con las nuevas descargas por autor. - Entradas: `df_pub_comp.csv` y  `author_filtered_publications.csv`- Salidas: `df_pub_comp_ENRICHED.csv`
 
 **10_build_author_topics.R** - Perfilado de Investigadores: Calcula el "Perfil Temático" de cada profesor agregando los topics de sus papers desde 2021 a 2025. - Entradas: `df_pub_UGR_with_topics.csv`, `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `final_author_topics_analysis.csv`
 
