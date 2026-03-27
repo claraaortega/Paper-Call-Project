@@ -116,7 +116,7 @@ Preparación del modelo SPECTER2 (Scripts en Python)
 
 El `archivo proyectos_simple.json` presenta para cada proyecto un "title" (identificador de la convocatoria con el título de la misma) y "full_content" (descripción de la convocatoria). Este archivo varía en función de qué proyectos queramos escoger, pero se puede obtener mediante scrapping de la web deseada. 
 
-El archivo `project_keywords.txt` se puede generar de muchas maneras. Ha de haber una lista de keywords para cada proyecto considerado en "proyectos_simple.json". Lo importante es que siga la estructura: PROYECTO X (ID del proyecto): keyword1, keyword2, etc. EJEMPLO: PROYECTO 1 (HORIZON-HLTH-2026-01-CARE-03): low-value care, health systems performance assessment, healthcare overuse, healthcare underuse, unwarranted clinical variation, implementation research, patient-centred care, health technology assessment, healthcare resource allocation, value-based healthcare, healthcare quality indicators, artificial intelligence in healthcare
+El archivo `project_keywords.txt` se puede generar de muchas maneras. Ha de haber una lista de keywords para cada proyecto considerado en "proyectos_simple.json". Lo importante es que siga la estructura: PROYECTO X (ID del proyecto): keyword1, keyword2, etc. *EJEMPLO*: PROYECTO 1 (HORIZON-HLTH-2026-01-CARE-03): low-value care, health systems performance assessment, healthcare overuse, healthcare underuse, unwarranted clinical variation, implementation research, patient-centred care, health technology assessment, healthcare resource allocation, value-based healthcare, healthcare quality indicators, artificial intelligence in healthcare.
 
 ## ⚠️ Notas Importantes de Mantenimiento
 
