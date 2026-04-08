@@ -94,17 +94,17 @@ Preparación de la base de datos (scripts en R)
 
 **09_merge_publications.R** - Fusiona la base de datos original de publicaciones con las nuevas descargas por autor. - Entradas: `df_pub_comp.csv` y  `author_filtered_publications.csv`- Salidas: `df_pub_comp_ENRICHED.csv`
 
-**10_build_author_topics.R** - Perfilado de Investigadores: Calcula el "Perfil Temático" de cada profesor agregando los topics de sus papers desde 2021 a 2025. - Entradas: `df_pub_UGR_with_topics.csv`, `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `final_author_topics_analysis.csv`
+**10_build_author_topics.R** - Perfilado de Investigadores: Calcula el "Perfil Temático" de cada profesor agregando los topics de sus papers de los últimos 10 años. - Entradas: `df_pub_UGR_with_topics.csv`, `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `final_author_topics_analysis.csv`
 
-**11_build_author_topics_bruto.R** - Tabla en bruto del script anterior para que el embedding lea para cada topic el número de veces que aparece. - Entradas: `df_pub_UGR_with_topics.csv`, `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `final_author_topics_analysis_bruto.csv`
+**11_build_author_topics_bruto.R** - Tabla en bruto del script anterior para que el embedding lea para cada topic el número de veces que aparece. El rango de años que se tienen en cuenta es personalizable. - Entradas: `df_pub_UGR_with_topics.csv`, `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `final_author_topics_analysis_bruto.csv`
 
-**12_build_author_text_profile.R** - Crea el "Corpus Textual" unificado de cada investigador. Agrupa todas las publicaciones de todos sus au_ids en una sola fila. - Entradas: `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `author_text_profiles.csv`
+**12_build_author_text_profile.R** - Crea el "Corpus Textual" unificado de cada investigador. Agrupa todas las publicaciones de todos sus au_ids en una sola fila. El rango de años que se tienen en cuenta es personalizable. - Entradas: `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `author_text_profiles.csv`
 
-**13_build_author_text_profile_count.R** - Tabla versionada de `author_text_profiles.csv` con las keywords de cada autor ordenadas de mayor a menor frecuencia. - Entradas: `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `author_text_profiles_count.csv`
+**13_build_author_text_profile_count.R** - Tabla versionada de `author_text_profiles.csv` con las keywords de cada autor ordenadas de mayor a menor frecuencia. El rango de años que se tienen en cuenta es personalizable. - Entradas: `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `author_text_profiles_count.csv`
 
-**14_build_author_text_profile_bruto.R** - Tabla en bruto de `author_text_profiles.csv` con las keywords del autor repetidas, de manera que el embedding las sintetice según el número de veces que aparecen.  - Entradas: `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `author_text_profiles_bruto.csv`
+**14_build_author_text_profile_bruto.R** - Tabla en bruto de `author_text_profiles.csv` con las keywords del autor repetidas, de manera que el embedding las sintetice según el número de veces que aparecen. El rango de años que se tienen en cuenta es personalizable. - Entradas: `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `author_text_profiles_bruto.csv`
 
-**15_build_pubs.R** - Obtiene una tabla que recoge la información de df_pub_comp_ENRICHED y la información de los topics de OpenAlex. La información de los topics se limpia. - Entradas: `df_pub_comp_ENRICHED.csv` y `openalex_topics.csv`- Salidas: `final_pubs.csv`
+**15_build_pubs.R** - Obtiene una tabla que recoge la información de df_pub_comp_ENRICHED y la información de los topics de OpenAlex. La información de los topics se limpia. El rango de años que se tienen en cuenta es personalizable. - Entradas: `df_pub_comp_ENRICHED.csv` y `openalex_topics.csv`- Salidas: `final_pubs.csv`
 
 Preparación del modelo SPECTER2 (Scripts en Python)
 
