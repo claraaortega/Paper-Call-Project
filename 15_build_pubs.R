@@ -1,5 +1,5 @@
 ##############################################################################
-# Script: 05.3_build_pubs.R
+# Script: 15_build_pubs.R
 # Propósito: 
 #   Obtener una tabla que recoja la información de df_pub_comp_ENRICHED y la 
 #   información de los topics de OpenAlex. La información de los topics se limpia.
@@ -26,8 +26,19 @@ FILE_PUBS <- file.path(DIR_INTERIM, "df_pub_comp_ENRICHED.csv")
 FILE_TOPICS <- file.path(DIR_INTERIM, "openalex_topics.csv")
 FILE_OUT <- file.path(DIR_OUTPUT, "final_pubs.csv")
 
-START_YEAR <- 2021
-END_YEAR   <- 2025
+END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
+START_YEAR <- END_YEAR - 4
+
+args <- commandArgs(trailingOnly = TRUE)
+
+if (length(args) >= 2) {
+  START_YEAR <- as.numeric(args[1])
+  END_YEAR   <- as.numeric(args[2])
+} else if (length(args) == 1) {
+  ventana <- as.numeric(args[1])
+  END_YEAR <- as.numeric(format(Sys.Date(), "%Y"))
+  START_YEAR <- END_YEAR - ventana
+}
 
 # ==============================================================================
 # --- 2. CARGA DE DATOS E IDENTIDADES ---
