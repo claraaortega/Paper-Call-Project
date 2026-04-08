@@ -1,5 +1,5 @@
 ##############################################################################
-# Script: 06_build_author_text_profile.R
+# Script: 12_build_author_text_profile.R
 # Propósito: 
 #   Crear el "Corpus Textual" unificado de cada investigador.
 #   Agrupa todas las publicaciones de todos sus au_ids en una sola fila.
@@ -26,8 +26,19 @@ FILE_PUBS <- file.path(DIR_INTERIM, "df_pub_comp_ENRICHED.csv")
 FILE_AUTHORS <- file.path(DIR_OUTPUT, "final_matches_consolidated.csv")
 FILE_OUT <- file.path(DIR_OUTPUT, "author_text_profiles.csv")
 
-START_YEAR <- 2021
-END_YEAR   <- 2025
+END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
+START_YEAR <- END_YEAR - 4
+
+args <- commandArgs(trailingOnly = TRUE)
+
+if (length(args) >= 2) {
+  START_YEAR <- as.numeric(args[1])
+  END_YEAR   <- as.numeric(args[2])
+} else if (length(args) == 1) {
+  ventana <- as.numeric(args[1])
+  END_YEAR <- as.numeric(format(Sys.Date(), "%Y"))
+  START_YEAR <- END_YEAR - ventana
+}
 NUM_PUBLICATIONS <- 3
 
 # ==============================================================================
