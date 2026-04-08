@@ -1,5 +1,5 @@
 ##############################################################################
-# Script: 05.2_build_author_topics.R
+# Script: 10_build_author_topics.R
 # Propósito: 
 #   Construir el "Perfil Temático" de cada autor.
 #   Identifica y suma los papers de todos los IDs (au_id) que pertenezcan 
@@ -31,8 +31,19 @@ FILE_MATCHES  <- file.path(DIR_OUTPUT, "final_matches_consolidated.csv")
 OUT_FINAL <- file.path(DIR_OUTPUT, "final_author_topics_analysis.csv")
 
 # Filtro de años
-START_YEAR <- 2021
-END_YEAR <- 2025
+END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
+START_YEAR <- END_YEAR - 4
+
+args <- commandArgs(trailingOnly = TRUE)
+
+if (length(args) >= 2) {
+  START_YEAR <- as.numeric(args[1])
+  END_YEAR   <- as.numeric(args[2])
+} else if (length(args) == 1) {
+  ventana <- as.numeric(args[1])
+  END_YEAR <- as.numeric(format(Sys.Date(), "%Y"))
+  START_YEAR <- END_YEAR - ventana
+}
 
 # ==============================================================================
 # --- 2. CARGA DE DATOS ---
