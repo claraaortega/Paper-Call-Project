@@ -1,5 +1,5 @@
 ##############################################################################
-# Script: 05.0.1_fetch_author_publications.R
+# Script: 08_fetch_author_publications.R
 # Propósito:
 #   Descargar todo el historial de los autores en bruto.
 #   1. Guarda los JSON crudos en caché (para no perder NINGÚN dato de Scopus).
@@ -28,16 +28,16 @@ api_key <- sub("API_KEY=", "", lineas)
 FILE_AUTHORS <- "data/output/final_matches_consolidated.csv"
 FILE_OUT     <- "data/output/author_filtered_publications.csv"
 
-# --- NUEVO DIRECTORIO DE CACHÉ (Para datos crudos) ---
+END_YEAR   <- as.numeric(format(Sys.Date(), "%Y"))
+START_YEAR <- END_YEAR - 10
+
+# --- DIRECTORIO DE CACHÉ (Para datos crudos) ---
 DIR_CACHE <- file.path("data", "interim", "author_pubs")
 if(!dir.exists(DIR_CACHE)) dir.create(DIR_CACHE, recursive = TRUE)
 
 FILE_REGISTRY <- file.path(DIR_CACHE, "_procesados_registry.rds")
 
 SCOPUS_SEARCH_URL <- "https://api.elsevier.com/content/search/scopus"
-
-START_YEAR <- 2020
-END_YEAR   <- 2025
 DOCTYPES   <- "ar OR re OR le OR bk OR ch"
 
 # ==============================================================================
