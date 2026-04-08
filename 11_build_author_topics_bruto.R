@@ -1,5 +1,5 @@
 ##############################################################################
-# Script: 05.2.1._build_author_topics_bruto.R
+# Script: 11._build_author_topics_bruto.R
 # Propósito: 
 #   Tabla en bruto para que el embedding lea para cada topic el número de veces 
 #   que aparece.
@@ -30,8 +30,19 @@ FILE_MATCHES  <- file.path(DIR_OUTPUT, "final_matches_consolidated.csv")
 OUT_FINAL <- file.path(DIR_OUTPUT, "final_author_topics_analysis_bruto.csv")
 
 # Filtro de años recientes
-START_YEAR <- 2021
-END_YEAR <- 2025
+END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
+START_YEAR <- END_YEAR - 4
+
+args <- commandArgs(trailingOnly = TRUE)
+
+if (length(args) >= 2) {
+  START_YEAR <- as.numeric(args[1])
+  END_YEAR   <- as.numeric(args[2])
+} else if (length(args) == 1) {
+  ventana <- as.numeric(args[1])
+  END_YEAR <- as.numeric(format(Sys.Date(), "%Y"))
+  START_YEAR <- END_YEAR - ventana
+}
 
 # ==============================================================================
 # --- 2. CARGA DE DATOS ---
