@@ -29,17 +29,6 @@ FILE_OUT <- file.path(DIR_OUTPUT, "final_pubs.csv")
 END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
 START_YEAR <- END_YEAR - 4
 
-args <- commandArgs(trailingOnly = TRUE)
-
-if (length(args) >= 2) {
-  START_YEAR <- as.numeric(args[1])
-  END_YEAR   <- as.numeric(args[2])
-} else if (length(args) == 1) {
-  ventana <- as.numeric(args[1])
-  END_YEAR <- as.numeric(format(Sys.Date(), "%Y"))
-  START_YEAR <- END_YEAR - ventana
-}
-
 # ==============================================================================
 # --- 2. CARGA DE DATOS E IDENTIDADES ---
 # ==============================================================================
