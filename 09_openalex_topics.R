@@ -1,5 +1,5 @@
 ##############################################################################
-# Script: 05_openalex_topics.R
+# Script: 09_openalex_topics.R
 # Propósito: 
 #   Enriquecer la tabla de publicaciones (df_pub_comp.csv) obteniendo los
 #   "Topics" (temas de investigación) desde la API de OpenAlex.
