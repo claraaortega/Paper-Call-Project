@@ -91,15 +91,19 @@ parse_topics_simple <- function(work) {
   if (!is.null(to) && length(to) > 0) {
     if (is.list(to) && !is.list(to[[1]])) to <- list(to)
     
-    # Filtro: solo topics con >99% de confianza
-    topics_filtered <- purrr::keep(to, ~ (as.numeric(.x$score %||% 0) > 0.99))
+    # Filtro: solo topics con >99% de confianza (Cambiado a Base R)
+    topics_filtered <- purrr::keep(to, ~ (as.numeric(ifelse(is.null(.x$score), 0, .x$score)) > 0.99))
+    
     if (length(topics_filtered) > 0) {
-      # Ordenar por puntuación descendente
-      scores <- vapply(topics_filtered, function(x) as.numeric(x$score %||% 0), numeric(1))
+      # Ordenar por puntuación descendente (Cambiado a Base R)
+      scores <- vapply(topics_filtered, function(x) as.numeric(ifelse(is.null(x$score), 0, x$score)), numeric(1))
       to_hs <- topics_filtered[order(-scores)]
+      
       # Formatear string: "Inteligencia Artificial (0.99; CS; AI; ...)"
-      labels <- map_chr(to_hs, function(t) {
-        sprintf("%s (%.3f; %s; %s; %s)", t$display_name %||% "NA", as.numeric(t$score %||% 0),
+      labels <- purrr::map_chr(to_hs, function(t) {
+        sprintf("%s (%.3f; %s; %s; %s)", 
+                ifelse(is.null(t$display_name), "NA", t$display_name), 
+                as.numeric(ifelse(is.null(t$score), 0, t$score)),
                 safe_dn(t$subfield), safe_dn(t$field), safe_dn(t$domain))
       })
       res$hs_topics_all <- paste(labels, collapse = " | ")
