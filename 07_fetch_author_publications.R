@@ -1,5 +1,5 @@
 ##############################################################################
-# Script: 08_fetch_author_publications.R
+# Script: 07_fetch_author_publications.R
 # Propósito:
 #   Descargar todo el historial de los autores en bruto.
 #   1. Guarda los JSON crudos en caché (para no perder NINGÚN dato de Scopus).
