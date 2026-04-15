@@ -1,5 +1,5 @@
 ##############################################################################
-# Script: 09_merge_publications.R
+# Script: 08_merge_publications.R
 # Propósito:
 #   Fusionar la base de datos original de publicaciones con las nuevas 
 #   descargas por autor.
