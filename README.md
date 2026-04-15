@@ -92,7 +92,7 @@ Preparación de la base de datos (scripts en R)
 
 **08_merge_publications.R** - Fusiona la base de datos original de publicaciones con las nuevas descargas por autor. - Entradas: `df_pub_comp.csv` y  `author_filtered_publications.csv`- Salidas: `df_pub_comp_ENRICHED.csv`
 
-**09_openalex_topics.R** - Topics de Investigación: Consulta a OpenAlex para obtener los temas (Topics) de cada publicación. Normaliza DOIs. - Entradas: `df_pub_comp.csv` - Salidas: `df_pub_UGR_with_topics.csv`
+**09_openalex_topics.R** - Topics de Investigación: Consulta a OpenAlex para obtener los temas (Topics) de cada publicación. Normaliza DOIs. - Entradas: `df_pub_comp_ENRICHED.csv` - Salidas: `df_pub_UGR_with_topics.csv`
 
 **10_build_author_topics.R** - Perfilado de Investigadores: Calcula el "Perfil Temático" de cada profesor agregando los topics de sus papers de los últimos 10 años. - Entradas: `df_pub_UGR_with_topics.csv`, `df_pub_comp_ENRICHED.csv` y `final_matches_consolidated.csv`- Salidas: `final_author_topics_analysis.csv`
 
