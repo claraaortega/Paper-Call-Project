@@ -18,30 +18,26 @@ from adapters import AutoAdapterModel
 warnings.filterwarnings('ignore')
 
 # ==============================================================================
-# --- 0. CONFIGURACIÓN DE RUTAS DINÁMICAS (BASH) ---
+# --- 0. CONFIGURACIÓN DE RUTAS DINÁMICAS ---
 # ==============================================================================
 rango_anos = os.environ.get("RANGO_ANOS", "5")
 
+DIR_ENTRADA_R = os.path.join("data", "output", f"{rango_anos}_anos")
 DIR_INTERIM = os.path.join("data", "interim")
-DIR_OUTPUT_BASE = os.path.join("data", "output")
-DIR_SALIDA = os.path.join(DIR_OUTPUT_BASE, f"{rango_anos}_anos")
+DIR_OUTPUT_BASE = os.path.join("data", "output") # Para el all_information_pubs.csv
 
-os.makedirs(DIR_SALIDA, exist_ok=True)
-
-# --- ENTRADAS ---
-FILE_PUBS          = os.path.join(DIR_SALIDA, "final_pubs.csv") 
-FILE_PROFILES      = os.path.join(DIR_SALIDA, "author_text_profiles_count.csv")
+FILE_PROFILES      = os.path.join(DIR_ENTRADA_R, "author_text_profiles_count.csv")
+FILE_PUBS          = os.path.join(DIR_ENTRADA_R, "final_pubs.csv") 
+FILE_TOPICS        = os.path.join(DIR_ENTRADA_R, "final_author_topics_analysis.csv")
 FILE_PUB_ENRICHED  = os.path.join(DIR_INTERIM, "df_pub_comp_ENRICHED.csv")
-FILE_TOPICS        = os.path.join(DIR_SALIDA, "final_author_topics_analysis.csv")
-
 FILE_ALL_INFO      = os.path.join(DIR_OUTPUT_BASE, "all_information_pubs.csv") 
 
 FILE_PROYECTOS     = "proyectos_simple.json"
 FILE_KEYWORDS      = "project_keywords.txt"
 
-# --- SALIDAS ---
-FILE_COMPROBACION  = os.path.join(DIR_SALIDA, "comprobacion_autores_filtrados.csv")
-FILE_OUT_LEADER    = os.path.join(DIR_SALIDA, "specter_liderazgo_score_z.csv")
+sufijo = "five" if rango_anos == "5" else "two"
+FILE_OUT_LEADER = os.path.join("data", f"all_proj_leader_{sufijo}_scorez.csv")
+FILE_COMPROBACION = os.path.join("data", f"comprobacion_liderazgo_{sufijo}.csv")
 
 # ---------------------------------------------------------
 # 1. CARGA DE MODELO Y TOKENIZER (SPECTER2)
