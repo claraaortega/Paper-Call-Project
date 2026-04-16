@@ -23,22 +23,19 @@ warnings.filterwarnings('ignore')
 # ==============================================================================
 rango_anos = os.environ.get("RANGO_ANOS", "5")
 
+DIR_ENTRADA_R = os.path.join("data", "output", f"{rango_anos}_anos")
 DIR_INTERIM = os.path.join("data", "interim")
-DIR_OUTPUT_BASE = os.path.join("data", "output")
-DIR_SALIDA = os.path.join(DIR_OUTPUT_BASE, f"{rango_anos}_anos")
 
-os.makedirs(DIR_SALIDA, exist_ok=True)
-
-FILE_PUBS          = os.path.join(DIR_SALIDA, "final_pubs.csv") 
-FILE_PROFILES      = os.path.join(DIR_SALIDA, "author_text_profiles_count.csv")
+FILE_PUBS          = os.path.join(DIR_ENTRADA_R, "final_pubs.csv") 
+FILE_PROFILES      = os.path.join(DIR_ENTRADA_R, "author_text_profiles_count.csv")
 FILE_PUB_ENRICHED  = os.path.join(DIR_INTERIM, "df_pub_comp_ENRICHED.csv")
-FILE_TOPICS        = os.path.join(DIR_SALIDA, "final_author_topics_analysis.csv")
+FILE_TOPICS        = os.path.join(DIR_ENTRADA_R, "final_author_topics_analysis.csv")
 
 FILE_PROYECTOS     = "proyectos_simple.json"
 FILE_KEYWORDS      = "project_keywords.txt"
 
-# --- ARCHIVO DE SALIDA ---
-FILE_OUT = os.path.join(DIR_SALIDA, "specter_score_z.csv")
+sufijo = "five" if rango_anos == "5" else "two"
+FILE_OUT = os.path.join("data", f"all_projects_{sufijo}_scorez.csv")
 
 # ---------------------------------------------------------
 # 1. CARGA DE MODELO Y TOKENIZER (SPECTER2)
