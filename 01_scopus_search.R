@@ -44,7 +44,9 @@ Sys.setenv(API_KEY = api_key)
 inst_token <- NA
 
 # Rango temporal (AJUSTABLE)
-years <- 2015:2025
+END_YEAR   <- as.numeric(format(Sys.Date(), "%Y"))
+START_YEAR <- END_YEAR - 10
+years <- START_YEAR:END_YEAR
 
 # IDs de afiliación (AF-ID) que definen UGR en Scopus
 ugr_ids <- c("60027844","60208599","60030188","60110413","60231070",
@@ -188,6 +190,10 @@ entries_to_long_df <- function(entries) if (!length(entries)) tibble() else map_
 # --- 4) Descarga por año (desde caché) y normalización ------------------------
 # Ejecuta las 4 queries por año, concatena, quita duplicados y etiqueta Year
 fetch_year_df <- function(y, force_refresh = FALSE) {
+
+  anio_actual <- as.numeric(format(Sys.Date(), "%Y"))
+  if (y >= (año_actual - 1)) force_refresh <- TRUE
+  
   queries <- list(q_inc_inc(y), q_inc_exc(y), q_exc_inc(y), q_exc_exc(y))
   parts <- map(queries, function(q) {
     entries <- fetch_all_entries_cached(query = q, force_refresh = force_refresh)
