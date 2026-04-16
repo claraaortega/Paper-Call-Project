@@ -23,11 +23,22 @@ DIR_OUTPUT  <- "data/output"
 
 FILE_PUBS <- file.path(DIR_INTERIM, "df_pub_comp_ENRICHED.csv") 
 FILE_AUTHORS <- file.path(DIR_OUTPUT, "final_matches_consolidated.csv")
-FILE_OUT <- file.path(DIR_OUTPUT, "author_text_profiles_bruto.csv")
 
 END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
 START_YEAR <- END_YEAR - 4
 NUM_PUBLICATIONS <- 3
+ventana <- 5
+
+args <- commandArgs(trailingOnly = TRUE)
+
+if (length(args) == 1) {
+  ventana <- as.numeric(args[1])
+  START_YEAR <- END_YEAR - (ventana - 1)
+}
+
+DIR_OUTPUT_VENTANA <- file.path(DIR_OUTPUT, paste0(ventana, "y"))
+dir.create(DIR_OUTPUT_VENTANA, showWarnings = FALSE, recursive = TRUE)
+FILE_OUT <- file.path(DIR_OUTPUT_VENTANA, "author_text_profiles_bruto.csv")
 
 # ==============================================================================
 # --- 2. CARGA DE DATOS E IDENTIDADES ---
