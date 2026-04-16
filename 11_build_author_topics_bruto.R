@@ -39,7 +39,8 @@ if (length(args) == 1) {
   START_YEAR <- END_YEAR - (ventana - 1)
 }
 
-DIR_OUTPUT_VENTANA <- file.path(DIR_OUTPUT, paste0(ventana, "y"))
+carpeta_ventana <- paste0(ventana, "_anos")
+DIR_OUTPUT_VENTANA <- file.path(DIR_OUTPUT, carpeta_ventana)
 dir.create(DIR_OUTPUT_VENTANA, showWarnings = FALSE, recursive = TRUE)
 OUT_FINAL <- file.path(DIR_OUTPUT_VENTANA, "final_author_topics_analysis_bruto.csv")
 
