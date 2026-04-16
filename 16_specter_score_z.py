@@ -10,13 +10,29 @@ import numpy as np
 import warnings
 import re
 import os
+import sys
 from collections import Counter
 
 from transformers import AutoTokenizer
 from adapters import AutoAdapterModel
 
-
 warnings.filterwarnings('ignore')
+
+# ==============================================================================
+# --- 0. CONFIGURACIÓN DINÁMICA (CONEXIÓN CON R) ---
+# ==============================================================================
+ventana = 5
+if len(sys.argv) > 1:
+    try:
+        ventana = int(sys.argv[1])
+    except ValueError:
+        pass
+
+DIR_DINAMICO = f"data/output/{ventana}y"
+DIR_INTERIM = "data/interim"
+
+print(f"=== INICIANDO SPECTER2 PARA VENTANA DE {ventana} AÑOS ===")
+print(f"Leyendo datos desde: {DIR_DINAMICO}/")
 
 # ---------------------------------------------------------
 # 1. CARGA DE MODELO Y TOKENIZER (SPECTER2)
@@ -62,7 +78,7 @@ def clean_embedding(v):
 # 2. LEER PAPERS Y EXTRAER EMBEDDINGS
 # ---------------------------------------------------------
 print("Leyendo dataset de papers...")
-csv_authors = pd.read_csv("final_pubs.csv")
+csv_authors = pd.read_csv(f"{DIR_DINAMICO}/final_pubs.csv")
 csv_authors['title'] = csv_authors['title'].fillna('')
 csv_authors['abstract'] = csv_authors['abstract'].fillna('')
 csv_authors['keywords'] = csv_authors['keywords'].fillna('')
@@ -88,7 +104,7 @@ for i in range(len(csv_authors)):
 print("Creando diccionario de fusión de IDs de autores...")
 id_mapping = {}
 try:
-    df_perfiles_map = pd.read_csv("author_text_profiles_count.csv")
+    df_perfiles_map = pd.read_csv(f"{DIR_DINAMICO}/author_text_profiles_count.csv")
     df_perfiles_map['au_id'] = df_perfiles_map['au_id'].astype(str).str.replace(r'\.0$', '', regex=True)
     
     for combined_id in df_perfiles_map['au_id'].dropna():
@@ -97,7 +113,7 @@ try:
             for ind_id in individual_ids:
                 id_mapping[ind_id] = combined_id
 except FileNotFoundError:
-    print("No se encontró 'author_text_profiles_count.csv'.")
+    print(f"No se encontró '{DIR_DINAMICO}/author_text_profiles_count.csv'.")
 
 # ---------------------------------------------------------
 # 3. ASOCIACIÓN DE VECTORES A NIVEL DE AUTOR
@@ -141,7 +157,7 @@ with open('proyectos_simple.json', 'r', encoding='utf-8') as f:
     proyectos_ejemplo = json.load(f)
 
 df_proyectos = pd.DataFrame(proyectos_ejemplo)
-df_pub_ENRICHED = pd.read_csv('df_pub_comp_ENRICHED.csv', sep=';')
+df_pub_ENRICHED = pd.read_csv(f'{DIR_INTERIM}/df_pub_comp_ENRICHED.csv', sep=';')
 
 # --- PRE-PROCESAMIENTO DE DICCIONARIOS ---
 eid_to_doi_map = dict(zip(df_pub_ENRICHED['eid'], df_pub_ENRICHED['doi']))
@@ -234,7 +250,7 @@ df_resultados['au_id'] = df_resultados['au_id'].astype(str).str.replace(r'\.0$',
 
 # A) LEER Y CRUZAR PERFILES
 try:
-    df_perfiles = pd.read_csv("author_text_profiles_count.csv")
+    df_perfiles = pd.read_csv(f"{DIR_DINAMICO}/author_text_profiles_count.csv")
     df_perfiles['au_id'] = df_perfiles['au_id'].astype(str).str.replace(r'\.0$', '', regex=True)
     
     df_perfiles_clean = df_perfiles[['au_id', 'name', 'top_keywords']].copy()
@@ -243,12 +259,12 @@ try:
     
     df_final = pd.merge(df_resultados, df_perfiles_clean, on='au_id', how='inner')
 except FileNotFoundError:
-    print("No se encontró 'author_text_profiles_count.csv'.")
+    print(f"No se encontró '{DIR_DINAMICO}/author_text_profiles_count.csv'.")
     df_final = df_resultados
 
 # B) LEER Y CRUZAR TOPICS DE OPENALEX
 try:
-    df_topics = pd.read_csv("final_author_topics_analysis.csv")
+    df_topics = pd.read_csv(f"{DIR_DINAMICO}/final_author_topics_analysis.csv")
     if 'scopus_ids' in df_topics.columns:
         df_topics = df_topics.rename(columns={'scopus_ids': 'au_id'})
     df_topics['au_id'] = df_topics['au_id'].astype(str).str.replace(r'\.0$', '', regex=True)
@@ -259,7 +275,7 @@ try:
     
     df_final = pd.merge(df_final, df_topics_clean, on='au_id', how='left')
 except FileNotFoundError:
-    print("No se encontró 'final_author_topics_analysis.csv'.")
+    print(f"No se encontró '{DIR_DINAMICO}/final_author_topics_analysis.csv'.")
 
 # C) LEER Y CRUZAR KEYWORDS DE LAS CALL
 call_kw_data = []
@@ -326,7 +342,7 @@ cols = list(dict.fromkeys(cols))
 df_final = df_final[cols]
 
 # 7. EXPORTAR
-nombre_salida = "all_projects_five_scorez.csv"
+nombre_salida = f"{DIR_DINAMICO}/all_projects_{ventana}y_scorez.csv"
 df_final.to_csv(nombre_salida, index=False, encoding='utf-8')
 
 print(f"\nProceso completado con éxito")
