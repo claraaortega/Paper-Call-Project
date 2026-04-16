@@ -27,11 +27,21 @@ FILE_TOPICS   <- file.path(DIR_INTER, "df_pub_UGR_with_topics.csv")
 FILE_PUB_AUTH <- file.path(DIR_INTER, "df_pub_comp_ENRICHED.csv")                  
 FILE_MATCHES  <- file.path(DIR_OUTPUT, "final_matches_consolidated.csv") 
 
-OUT_FINAL <- file.path(DIR_OUTPUT, "final_author_topics_analysis_bruto.csv")
-
 # Filtro de años recientes
 END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
 START_YEAR <- END_YEAR - 4
+ventana <- 5
+
+args <- commandArgs(trailingOnly = TRUE)
+
+if (length(args) == 1) {
+  ventana <- as.numeric(args[1])
+  START_YEAR <- END_YEAR - (ventana - 1)
+}
+
+DIR_OUTPUT_VENTANA <- file.path(DIR_OUTPUT, paste0(ventana, "y"))
+dir.create(DIR_OUTPUT_VENTANA, showWarnings = FALSE, recursive = TRUE)
+OUT_FINAL <- file.path(DIR_OUTPUT_VENTANA, "final_author_topics_analysis_bruto.csv")
 
 # ==============================================================================
 # --- 2. CARGA DE DATOS ---
