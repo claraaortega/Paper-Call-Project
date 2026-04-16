@@ -19,28 +19,20 @@ suppressPackageStartupMessages({
 # ==============================================================================
 # --- 1. CONFIGURACIÓN ---
 # ==============================================================================
+rango <- Sys.getenv("RANGO_ANOS")
+if (rango == "") rango <- "5"
+
 DIR_INTERIM <- "data/interim"
-DIR_OUTPUT  <- "data/output"
+
+DIR_SALIDA <- file.path("data", "output", paste0(rango, "_anos"))
+if(!dir.exists(DIR_SALIDA)) dir.create(DIR_SALIDA, recursive = TRUE)
 
 FILE_PUBS <- file.path(DIR_INTERIM, "df_pub_comp_ENRICHED.csv") 
 FILE_TOPICS <- file.path(DIR_INTERIM, "openalex_topics.csv")
+FILE_OUT <- file.path(DIR_SALIDA, "final_pubs.csv")
 
 END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
-START_YEAR <- END_YEAR - 4
-ventana <- 5
-
-args <- commandArgs(trailingOnly = TRUE)
-
-if (length(args) == 1) {
-  ventana <- as.numeric(args[1])
-  START_YEAR <- END_YEAR - (ventana - 1)
-}
-
-# --- LÓGICA DE CARPETAS ---
-DIR_OUTPUT_VENTANA <- file.path(DIR_OUTPUT, paste0(ventana, "y"))
-dir.create(DIR_OUTPUT_VENTANA, showWarnings = FALSE, recursive = TRUE)
-
-FILE_OUT <- file.path(DIR_OUTPUT_VENTANA, "final_pubs.csv")
+START_YEAR <- END_YEAR - (as.numeric(rango) - 1)
 
 # ==============================================================================
 # --- 2. CARGA DE DATOS E IDENTIDADES ---
