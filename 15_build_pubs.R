@@ -24,10 +24,23 @@ DIR_OUTPUT  <- "data/output"
 
 FILE_PUBS <- file.path(DIR_INTERIM, "df_pub_comp_ENRICHED.csv") 
 FILE_TOPICS <- file.path(DIR_INTERIM, "openalex_topics.csv")
-FILE_OUT <- file.path(DIR_OUTPUT, "final_pubs.csv")
 
 END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
 START_YEAR <- END_YEAR - 4
+ventana <- 5
+
+args <- commandArgs(trailingOnly = TRUE)
+
+if (length(args) == 1) {
+  ventana <- as.numeric(args[1])
+  START_YEAR <- END_YEAR - (ventana - 1)
+}
+
+# --- LÓGICA DE CARPETAS ---
+DIR_OUTPUT_VENTANA <- file.path(DIR_OUTPUT, paste0(ventana, "y"))
+dir.create(DIR_OUTPUT_VENTANA, showWarnings = FALSE, recursive = TRUE)
+
+FILE_OUT <- file.path(DIR_OUTPUT_VENTANA, "final_pubs.csv")
 
 # ==============================================================================
 # --- 2. CARGA DE DATOS E IDENTIDADES ---
