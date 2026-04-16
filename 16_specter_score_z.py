@@ -10,29 +10,35 @@ import numpy as np
 import warnings
 import re
 import os
-import sys
 from collections import Counter
 
 from transformers import AutoTokenizer
 from adapters import AutoAdapterModel
 
+
 warnings.filterwarnings('ignore')
 
 # ==============================================================================
-# --- 0. CONFIGURACIÓN DINÁMICA (CONEXIÓN CON R) ---
+# --- 0. CONFIGURACIÓN DE RUTAS DINÁMICAS (BASH) ---
 # ==============================================================================
-ventana = 5
-if len(sys.argv) > 1:
-    try:
-        ventana = int(sys.argv[1])
-    except ValueError:
-        pass
+rango_anos = os.environ.get("RANGO_ANOS", "5")
 
-DIR_DINAMICO = f"data/output/{ventana}y"
-DIR_INTERIM = "data/interim"
+DIR_INTERIM = os.path.join("data", "interim")
+DIR_OUTPUT_BASE = os.path.join("data", "output")
+DIR_SALIDA = os.path.join(DIR_OUTPUT_BASE, f"{rango_anos}_anos")
 
-print(f"=== INICIANDO SPECTER2 PARA VENTANA DE {ventana} AÑOS ===")
-print(f"Leyendo datos desde: {DIR_DINAMICO}/")
+os.makedirs(DIR_SALIDA, exist_ok=True)
+
+FILE_PUBS          = os.path.join(DIR_SALIDA, "final_pubs.csv") 
+FILE_PROFILES      = os.path.join(DIR_SALIDA, "author_text_profiles_count.csv")
+FILE_PUB_ENRICHED  = os.path.join(DIR_INTERIM, "df_pub_comp_ENRICHED.csv")
+FILE_TOPICS        = os.path.join(DIR_SALIDA, "final_author_topics_analysis.csv")
+
+FILE_PROYECTOS     = "proyectos_simple.json"
+FILE_KEYWORDS      = "project_keywords.txt"
+
+# --- ARCHIVO DE SALIDA ---
+FILE_OUT = os.path.join(DIR_SALIDA, "specter_score_z.csv")
 
 # ---------------------------------------------------------
 # 1. CARGA DE MODELO Y TOKENIZER (SPECTER2)
@@ -78,7 +84,7 @@ def clean_embedding(v):
 # 2. LEER PAPERS Y EXTRAER EMBEDDINGS
 # ---------------------------------------------------------
 print("Leyendo dataset de papers...")
-csv_authors = pd.read_csv(f"{DIR_DINAMICO}/final_pubs.csv")
+csv_authors = pd.read_csv(FILE_PUBS)
 csv_authors['title'] = csv_authors['title'].fillna('')
 csv_authors['abstract'] = csv_authors['abstract'].fillna('')
 csv_authors['keywords'] = csv_authors['keywords'].fillna('')
@@ -104,7 +110,7 @@ for i in range(len(csv_authors)):
 print("Creando diccionario de fusión de IDs de autores...")
 id_mapping = {}
 try:
-    df_perfiles_map = pd.read_csv(f"{DIR_DINAMICO}/author_text_profiles_count.csv")
+    df_perfiles_map = pd.read_csv(FILE_PROFILES)
     df_perfiles_map['au_id'] = df_perfiles_map['au_id'].astype(str).str.replace(r'\.0$', '', regex=True)
     
     for combined_id in df_perfiles_map['au_id'].dropna():
@@ -113,7 +119,7 @@ try:
             for ind_id in individual_ids:
                 id_mapping[ind_id] = combined_id
 except FileNotFoundError:
-    print(f"No se encontró '{DIR_DINAMICO}/author_text_profiles_count.csv'.")
+    print(f"No se encontró '{FILE_PROFILES}'.")
 
 # ---------------------------------------------------------
 # 3. ASOCIACIÓN DE VECTORES A NIVEL DE AUTOR
@@ -153,11 +159,11 @@ for au_id, group in df_ap.groupby('au_id'):
 # 4. LEER CALLS Y ASOCIAR A PUBLICACIONES
 # ---------------------------------------------------------
 print("Calculando embedding de proyectos...")
-with open('proyectos_simple.json', 'r', encoding='utf-8') as f:
+with open(FILE_PROYECTOS, 'r', encoding='utf-8') as f:
     proyectos_ejemplo = json.load(f)
 
 df_proyectos = pd.DataFrame(proyectos_ejemplo)
-df_pub_ENRICHED = pd.read_csv(f'{DIR_INTERIM}/df_pub_comp_ENRICHED.csv', sep=';')
+df_pub_ENRICHED = pd.read_csv(FILE_PUB_ENRICHED, sep=';')
 
 # --- PRE-PROCESAMIENTO DE DICCIONARIOS ---
 eid_to_doi_map = dict(zip(df_pub_ENRICHED['eid'], df_pub_ENRICHED['doi']))
@@ -250,7 +256,7 @@ df_resultados['au_id'] = df_resultados['au_id'].astype(str).str.replace(r'\.0$',
 
 # A) LEER Y CRUZAR PERFILES
 try:
-    df_perfiles = pd.read_csv(f"{DIR_DINAMICO}/author_text_profiles_count.csv")
+    df_perfiles = pd.read_csv(FILE_PROFILES)
     df_perfiles['au_id'] = df_perfiles['au_id'].astype(str).str.replace(r'\.0$', '', regex=True)
     
     df_perfiles_clean = df_perfiles[['au_id', 'name', 'top_keywords']].copy()
@@ -259,12 +265,12 @@ try:
     
     df_final = pd.merge(df_resultados, df_perfiles_clean, on='au_id', how='inner')
 except FileNotFoundError:
-    print(f"No se encontró '{DIR_DINAMICO}/author_text_profiles_count.csv'.")
+    print(f"No se encontró '{FILE_PROFILES}'.")
     df_final = df_resultados
 
 # B) LEER Y CRUZAR TOPICS DE OPENALEX
 try:
-    df_topics = pd.read_csv(f"{DIR_DINAMICO}/final_author_topics_analysis.csv")
+    df_topics = pd.read_csv(FILE_TOPICS)
     if 'scopus_ids' in df_topics.columns:
         df_topics = df_topics.rename(columns={'scopus_ids': 'au_id'})
     df_topics['au_id'] = df_topics['au_id'].astype(str).str.replace(r'\.0$', '', regex=True)
@@ -275,12 +281,12 @@ try:
     
     df_final = pd.merge(df_final, df_topics_clean, on='au_id', how='left')
 except FileNotFoundError:
-    print(f"No se encontró '{DIR_DINAMICO}/final_author_topics_analysis.csv'.")
+    print(f"No se encontró '{FILE_TOPICS}'.")
 
 # C) LEER Y CRUZAR KEYWORDS DE LAS CALL
 call_kw_data = []
-if os.path.exists("project_keywords.txt"):
-    with open("project_keywords.txt", "r", encoding="utf-8") as f:
+if os.path.exists(FILE_KEYWORDS):
+    with open(FILE_KEYWORDS, "r", encoding="utf-8") as f:
         for line in f:
             if ":" in line:
                 match = re.search(r'\((.*?)\):\s(.*)', line)
@@ -294,7 +300,7 @@ if os.path.exists("project_keywords.txt"):
     if not df_call_kw.empty:
         df_final = pd.merge(df_final, df_call_kw, on='Call_ID', how='left')
 else:
-    print("No se encontró 'project_keywords.txt'.")
+    print(f"No se encontró '{FILE_KEYWORDS}'.")
 
 
 # ---------------------------------------------------------
@@ -342,7 +348,7 @@ cols = list(dict.fromkeys(cols))
 df_final = df_final[cols]
 
 # 7. EXPORTAR
-nombre_salida = f"{DIR_DINAMICO}/all_projects_{ventana}y_scorez.csv"
+nombre_salida = FILE_OUT
 df_final.to_csv(nombre_salida, index=False, encoding='utf-8')
 
 print(f"\nProceso completado con éxito")
