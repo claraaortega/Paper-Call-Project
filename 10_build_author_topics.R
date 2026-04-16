@@ -21,24 +21,24 @@ suppressPackageStartupMessages({
 # ==============================================================================
 # --- 1. CONFIGURACIÓN ---
 # ==============================================================================
+rango <- Sys.getenv("RANGO_ANOS")
+if (rango == "") rango <- "5" 
+
 DIR_INTER  <- file.path("data", "interim")
-DIR_OUTPUT <- file.path("data", "output")
+DIR_OUTPUT_BASE <- file.path("data", "output")
+
+DIR_SALIDA <- file.path("data", "output", paste0(rango, "_anos"))
+if(!dir.exists(DIR_SALIDA)) dir.create(DIR_SALIDA, recursive = TRUE)
 
 FILE_TOPICS   <- file.path(DIR_INTER, "df_pub_UGR_with_topics.csv")      
 FILE_PUB_AUTH <- file.path(DIR_INTER, "df_pub_comp_ENRICHED.csv")                  
-FILE_MATCHES  <- file.path(DIR_OUTPUT, "final_matches_consolidated.csv") 
+FILE_MATCHES  <- file.path(DIR_OUTPUT_BASE, "final_matches_consolidated.csv") 
+
+OUT_FINAL <- file.path(DIR_SALIDA, "final_author_topics_analysis.csv")
 
 # Filtro de años
-env_ventana <- Sys.getenv("RANGO_ANOS")
-ventana <- if (env_ventana == "") 5 else as.numeric(env_ventana)
-
 END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
-START_YEAR <- END_YEAR - (ventana - 1)
-
-carpeta_ventana <- paste0(ventana, "_anos")
-DIR_OUTPUT_VENTANA <- file.path(DIR_OUTPUT, carpeta_ventana)
-dir.create(DIR_OUTPUT_VENTANA, showWarnings = FALSE, recursive = TRUE)
-OUT_FINAL <- file.path(DIR_OUTPUT_VENTANA, "final_author_topics_analysis.csv")
+START_YEAR <- END_YEAR - (as.numeric(rango) - 1)
 
 # ==============================================================================
 # --- 2. CARGA DE DATOS ---
