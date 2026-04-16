@@ -29,16 +29,11 @@ FILE_PUB_AUTH <- file.path(DIR_INTER, "df_pub_comp_ENRICHED.csv")
 FILE_MATCHES  <- file.path(DIR_OUTPUT, "final_matches_consolidated.csv") 
 
 # Filtro de años
+env_ventana <- Sys.getenv("RANGO_ANOS")
+ventana <- if (env_ventana == "") 5 else as.numeric(env_ventana)
+
 END_YEAR <- as.numeric(format(Sys.Date(), "%Y")) - 1
-START_YEAR <- END_YEAR - 4
-ventana <- 5
-
-args <- commandArgs(trailingOnly = TRUE)
-
-if (length(args) == 1) {
-  ventana <- as.numeric(args[1])
-  START_YEAR <- END_YEAR - (ventana - 1)
-}
+START_YEAR <- END_YEAR - (ventana - 1)
 
 carpeta_ventana <- paste0(ventana, "_anos")
 DIR_OUTPUT_VENTANA <- file.path(DIR_OUTPUT, carpeta_ventana)
