@@ -1,9 +1,9 @@
 ##############################################################################
 # Script: 07_fetch_author_publications.R
 # Propósito:
-#   Descargar todo el historial de los autores en bruto.
-#   1. Guarda los JSON crudos en caché (para no perder NINGÚN dato de Scopus).
-#   2. Lee la caché y parsea solo las columnas deseadas a un CSV.
+#   Descargar el historial de publicaciones de los autores.
+#   LÓGICA: Caché inteligente con caducidad de 30 días.
+#   Si un lote de caché es antiguo, se borra y se vuelve a descargar.
 #
 # Entradas:
 #   - data/output/final_matches_consolidated.csv
@@ -30,6 +30,7 @@ FILE_OUT     <- "data/output/author_filtered_publications.csv"
 
 END_YEAR   <- as.numeric(format(Sys.Date(), "%Y"))
 START_YEAR <- END_YEAR - 10
+MAX_CACHE_AGE_DAYS <- 30
 
 # --- DIRECTORIO DE CACHÉ (Para datos crudos) ---
 DIR_CACHE <- file.path("data", "interim", "author_pubs")
@@ -41,7 +42,24 @@ SCOPUS_SEARCH_URL <- "https://api.elsevier.com/content/search/scopus"
 DOCTYPES   <- "ar OR re OR le OR bk OR ch"
 
 # ==============================================================================
-# --- 2. FUNCIÓN DE DESCARGA BATCH (SOLO DESCARGA) ---
+# --- 2. LIMPIEZA INTELIGENTE DE CACHÉ (NUEVO) ---
+# ==============================================================================
+archivos_cache <- list.files(DIR_CACHE, pattern = "^batch_raw_.*\\.rds$", full.names = TRUE)
+
+if (length(archivos_cache) > 0) {
+  info_archivos <- file.info(archivos_cache)
+  edades_dias <- as.numeric(difftime(Sys.time(), info_archivos$mtime, units = "days"))
+  
+  archivos_caducados <- archivos_cache[edades_dias > MAX_CACHE_AGE_DAYS]
+  
+  if (length(archivos_caducados) > 0) {
+    file.remove(archivos_caducados)
+    if(file.exists(FILE_REGISTRY)) file.remove(FILE_REGISTRY)
+  }
+}
+
+# ==============================================================================
+# --- 3. FUNCIÓN DE DESCARGA BATCH ---
 # ==============================================================================
 fetch_raw_entries_for_authors <- function(au_ids) {
   
@@ -83,7 +101,7 @@ fetch_raw_entries_for_authors <- function(au_ids) {
 }
 
 # ==============================================================================
-# --- 3. COMPROBACIÓN DE CACHÉ Y PENDIENTES ---
+# --- 4. GESTIÓN DE PENDIENTES ---
 # ==============================================================================
 cat("Cargando investigadores...\n")
 
@@ -97,9 +115,8 @@ df_authors <- read_csv(FILE_AUTHORS, show_col_types = FALSE) %>%
 
 au_ids_totales <- df_authors$au_id
 
-if (file.exists(FILE_REGISTRY)) {
+if (file.exists(FILE_REGISTRY) && length(list.files(DIR_CACHE, pattern="batch_raw")) > 0) {
   au_ids_procesados <- readRDS(FILE_REGISTRY)
-  cat("Caché detectada. Autores ya procesados:", length(au_ids_procesados), "\n")
 } else {
   au_ids_procesados <- character(0)
 }
@@ -108,7 +125,7 @@ au_ids_pendientes <- setdiff(au_ids_totales, au_ids_procesados)
 cat("Autores pendientes de descarga:", length(au_ids_pendientes), "\n")
 
 # ==============================================================================
-# --- 4. BUCLE DE DESCARGA Y GUARDADO EN BRUTO ---
+# --- 4. BUCLE DE DESCARGA ---
 # ==============================================================================
 BATCH_SIZE <- 15
 
@@ -147,7 +164,7 @@ if (length(au_ids_pendientes) > 0) {
 }
 
 # ==============================================================================
-# --- 5. PARSEO DESDE LA CACHÉ ---
+# --- 6. PARSEO DESDE LA CACHÉ ---
 # ==============================================================================
 cat("Parseando datos crudos desde la caché local...\n")
 
