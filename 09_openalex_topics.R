@@ -117,21 +117,29 @@ parse_topics_simple <- function(work) {
 # ==============================================================================
 cat("Verificando caché...\n")
 
+MAX_CACHE_AGE_DAYS <- 30
+
 if (file.exists(CACHE_RDS)) {
-  topics_cache <- readRDS(CACHE_RDS)
+  info_archivo <- file.info(CACHE_RDS)
+  edad_dias <- as.numeric(difftime(Sys.time(), info_archivo$mtime, units = "days"))
   
-  # Validación de estructura (por si es una caché vieja incompatible)
-  if ("primary_topic_name" %in% names(topics_cache)) {
-    message("Caché antigua. Reiniciando.")
+  if (edad_dias > MAX_CACHE_AGE_DAYS) {
+    message(sprintf(" -> La caché tiene %d días (caducada). Reiniciando para refrescar Topics.", round(edad_dias)))
     topics_cache <- tibble(doi = character(), oa_id = character(), hs_topics_all = character())
   } else {
-    # Normalización de la caché
-    topics_cache <- topics_cache %>%
-      mutate(doi = norm_doi(doi)) %>%
-      filter(!is.na(doi), doi != "") %>%
-      distinct(doi, .keep_all = TRUE)
+    topics_cache <- readRDS(CACHE_RDS)
     
-    message("Caché cargada y normalizada: ", nrow(topics_cache), " topics.")
+    # Validación de estructura y normalización
+    if ("primary_topic_name" %in% names(topics_cache)) {
+      message("Caché antigua. Reiniciando.")
+      topics_cache <- tibble(doi = character(), oa_id = character(), hs_topics_all = character())
+    } else {
+      topics_cache <- topics_cache %>%
+        mutate(doi = norm_doi(doi)) %>%
+        filter(!is.na(doi), doi != "") %>%
+        distinct(doi, .keep_all = TRUE)
+      message("Caché cargada (Edad: ", round(edad_dias), " días): ", nrow(topics_cache), " papers.")
+    }
   }
 } else {
   topics_cache <- tibble(doi = character(), oa_id = character(), hs_topics_all = character())
