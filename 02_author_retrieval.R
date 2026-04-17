@@ -4,23 +4,19 @@
 #   Recuperar datos de Scopus Author Retrieval para cada autor (au_id)
 #   identificado previamente en la tabla de autores UGR (df_au_UGR.csv).
 #
-# Lógica del Algoritmo:
-#   1. Lee la lista maestra de IDs de autores (df_au_UGR.csv).
-#   2. Comprueba qué perfiles ya tenemos descargados en CACHÉ.
-#   3. Descarga SOLO los perfiles nuevos que faltan (Delta).
-#   4. Procesa todos los archivos de caché (JSON) y extrae:
-#       - Nombre completo (Given + Surname)
-#       - ORCID
-#       - Afiliación actual y Departamento
-#   5. Genera la tabla enriquecida final (df_au_UGR_complete.csv).
+# Lógica del Algoritmo (CACHÉ CON CADUCIDAD):
+#   1. Comprueba la fecha de modificación de la caché. Borra los archivos 
+#      que tengan más de 30 días de antigüedad.
+#   2. Comprueba qué perfiles nos faltan por descargar hoy.
+#   3. Descarga SOLO los perfiles nuevos que faltan.
+#   4. Genera la tabla enriquecida final (df_au_UGR_complete.csv).
 #
 # Entradas:
-#   - data/interim/df_au_UGR.csv (Lista de IDs a consultar)
+#   - data/interim/df_au_UGR.csv
 #   - Credenciales: ~/.mi_api_key
 #
 # Salidas:
 #   - data/interim/df_au_UGR_complete.csv
-#   - data/interim/cache/scopus/author_<au_id>.rds
 ##############################################################################
 
 suppressPackageStartupMessages({
@@ -35,9 +31,26 @@ suppressPackageStartupMessages({
 DIR_INTERIM   <- file.path("data", "interim")
 DIR_CACHE          <- file.path("data", "interim", "cache", "scopus")
 
+# LÍMITE DE CADUCIDAD DE LA CACHÉ (EN DÍAS)
+MAX_CACHE_AGE_DAYS <- 30
+
 # Crear directorios si no existen
 dir.create(DIR_INTERIM, showWarnings = FALSE, recursive = TRUE)
 dir.create(DIR_CACHE, showWarnings = FALSE, recursive = TRUE)
+
+# --- LIMPIEZA INTELIGENTE DE CACHÉ ---
+archivos_cache <- list.files(DIR_CACHE, pattern="^author_.*\\.rds$", full.names=TRUE)
+
+if (length(archivos_cache) > 0) {
+  info_archivos <- file.info(archivos_cache)
+  edades_dias <- as.numeric(difftime(Sys.time(), info_archivos$mtime, units = "days"))
+  
+  archivos_caducados <- archivos_cache[edades_dias > MAX_CACHE_AGE_DAYS]
+  
+  if (length(archivos_caducados) > 0) {
+    file.remove(archivos_caducados)
+  }
+}
 
 # Carga de Credenciales (API Key oculta)
 if(!file.exists("~/.mi_api_key")) stop("ERROR: Falta el archivo ~/.mi_api_key")
