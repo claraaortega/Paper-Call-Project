@@ -192,7 +192,7 @@ entries_to_long_df <- function(entries) if (!length(entries)) tibble() else map_
 fetch_year_df <- function(y, force_refresh = FALSE) {
 
   anio_actual <- as.numeric(format(Sys.Date(), "%Y"))
-  if (y >= (año_actual - 1)) force_refresh <- TRUE
+  if (y >= (anio_actual - 1)) force_refresh <- TRUE
   
   queries <- list(q_inc_inc(y), q_inc_exc(y), q_exc_inc(y), q_exc_exc(y))
   parts <- map(queries, function(q) {
